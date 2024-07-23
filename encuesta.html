@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encuesta de Satisfacción</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+        }
+        .encuesta-box {
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .opciones label {
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="encuesta-box">
+        <h1 class="text-center mb-4">Encuesta de Satisfacción</h1>
+        <form id="encuestaForm">
+            <div class="form-group">
+                <label for="satisfaccion">¿Cómo calificaría nuestro servicio?</label><br>
+                <div class="opciones">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="satisfaccion" id="bueno" value="bueno">
+                        <label class="form-check-label" for="bueno">Bueno</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="satisfaccion" id="regular" value="regular">
+                        <label class="form-check-label" for="regular">Regular</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="satisfaccion" id="malo" value="malo">
+                        <label class="form-check-label" for="malo">Malo</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" id="observacionGroup" style="display: none;">
+                <label for="observacion">Observación:</label>
+                <textarea class="form-control" id="observacion" name="observacion" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Enviar Encuesta</button>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS y dependencias opcionales (jQuery y Popper.js) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.all.min.js"></script>
+
+    <script>
+        document.getElementById('encuestaForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Evitar el envío del formulario por defecto
+
+            // Obtener la opción seleccionada
+            var satisfaccion = document.querySelector('input[name="satisfaccion"]:checked');
+            var observacion = document.getElementById('observacion').value.trim();
+
+            if (satisfaccion) {
+                // Mostrar SweetAlert según la opción seleccionada
+                var mensaje = '';
+                switch (satisfaccion.value) {
+                    case 'bueno':
+                        mensaje = '¡Gracias por tu calificación positiva!';
+                        break;
+                    case 'regular':
+                        mensaje = 'Tomaremos en cuenta tus comentarios para mejorar.';
+                        break;
+                    case 'malo':
+                        mensaje = 'Lamentamos no haber cumplido tus expectativas.';
+                        break;
+                }
+
+                if (satisfaccion.value === 'regular' || satisfaccion.value === 'malo') {
+                    // Si es regular o malo, verificar si se ha proporcionado una observación
+                    if (observacion === '') {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Por favor proporciona una observación.',
+                            icon: 'error',
+                            confirmButtonText: 'Ok'
+                        });
+                        return; // Salir del evento sin enviar la encuesta
+                    }
+                }
+
+                // Mostrar SweetAlert de éxito y enviar la encuesta
+                Swal.fire({
+                    title: '¡Encuesta Enviada!',
+                    text: mensaje,
+                    icon: 'success',
+                    confirmButtonText: 'Ok'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Aquí podrías enviar los datos del formulario a través de AJAX o redirigir a otra página
+                        document.getElementById('encuestaForm').reset(); // Limpiar el formulario después de enviar
+                    }
+                });
+            } else {
+                // Mostrar alerta si no se seleccionó ninguna opción
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Por favor selecciona una opción.',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+            }
+        });
+
+        // Mostrar u ocultar campo de observación según la selección de satisfacción
+        document.querySelectorAll('input[name="satisfaccion"]').forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                if (this.value === 'regular' || this.value === 'malo') {
+                    document.getElementById('observacionGroup').style.display = 'block';
+                } else {
+                    document.getElementById('observacionGroup').style.display = 'none';
+                    document.getElementById('observacion').value = ''; // Limpiar el campo de observación si no es necesario
+                }
+            });
+        });
+    </script>
+</body>
+</html>
